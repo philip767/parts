@@ -1,0 +1,14 @@
+# Backend Dockerfile
+FROM node:18-alpine as build
+WORKDIR /app
+COPY backend/package.json backend/tsconfig.json ./
+COPY backend/src ./src
+RUN npm install && npm run build
+
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY backend/package.json ./
+RUN npm install --production
+ENV NODE_ENV=production
+CMD ["node", "dist/app.js"] 
